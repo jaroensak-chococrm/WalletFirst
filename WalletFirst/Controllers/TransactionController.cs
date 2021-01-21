@@ -25,15 +25,11 @@ namespace WalletFirst.Controllers
     public class TransactionController : ControllerBase
     {
         private readonly WalletDBContext _context;
+        //  private readonly IServiceScopeFactory scopeFactory;
 
-        private readonly object balanceLock = new object();
+        private static readonly object balanceLock = new object();
 
-        public  int i;
-
-        private readonly ILogger<TransactionController> logger;
-        private Timer timer;
-        private int number;
-        Queue queuetest = new Queue();
+        public int i;
 
         public TransactionController (WalletDBContext context)
         {
@@ -80,8 +76,6 @@ namespace WalletFirst.Controllers
             return trans;
         }
 
-
-
         // Post: api/Transaction/
         [HttpPost("PostTransactionDe")]
         public async Task<ActionResult<Transaction>> PostTransactionDe (Transaction transaction)
@@ -124,7 +118,37 @@ namespace WalletFirst.Controllers
             }
         }
 
+        //notuse
+        [HttpGet("PostTransactionThreadPool")]
+        public async Task<ActionResult<Transaction>> PostTransactionThreadPool ()
+        {
+            //for (var i = 0; i < 5; i++)
+            //    ThreadPool.QueueUserWorkItem(WorkItem, i);
 
+            //ThreadPool.SetMaxThreads(32, 10);
+            //ThreadPool.SetMinThreads(16, 10);
+            //var x = ThreadPool.SetMaxThreads(32, 10);
+            //while (ThreadPool.PendingWorkItemCount != 0)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"Thread = {ThreadPool.ThreadCount}");
+            //    System.Diagnostics.Debug.WriteLine($"Thread = {ThreadPool.CompletedWorkItemCount}");
+            //    System.Diagnostics.Debug.WriteLine($"Thread = {ThreadPool.PendingWorkItemCount}");
+            //    System.Diagnostics.Debug.WriteLine($" {x}");
+            //    Thread.Sleep(500);
+            //}
+
+            ThreadPoolExample.testTing();
+            return NotFound();
+
+        }
+
+        //notuse
+        public void WorkItem (object o)
+        {
+            Thread.Sleep(new Random().Next(1000, 1000));
+            System.Diagnostics.Debug.WriteLine("WorkItem Jaa");
+        }
+        //notuse
         [HttpPost("PostTransactionTest")]
         public static int PostTransactionTest (Transaction transaction)
         {
@@ -133,43 +157,43 @@ namespace WalletFirst.Controllers
             System.Diagnostics.Debug.WriteLine(queue.Count());
             return queue.Count();
 
-          //  ShortStringDictionary mySSC = new ShortStringDictionary();
-       //     mySSC.Add("One", "a");
+            //  ShortStringDictionary mySSC = new ShortStringDictionary();
+            //     mySSC.Add("One", "a");
         }
-
+        //notuse
         [HttpPost("PostTransactionPage")]
         public async Task<ActionResult<Transaction>> PostTransactionPage (Transaction transaction)
         {
-           /* while(1 == 1)
-            {
-                if(queue.Count > 0)
-                {
-                    Transaction tran = new Transaction();
-                    Transaction  transaction = queue.Peek();
-                    tran.WalletId = transaction.WalletId;
-                    tran.Amount = transaction.Amount;
-                    tran.Destination = transaction.Destination;
-                    tran.Type = transaction.Type;
-                    tran.TimeCreate = DateTime.Now;
-                    tran.WalletNo = transaction.WalletNo;
-                    //var wallet = _context.Wallets.FirstOrDefault(x => x.WalletNo == transaction.WalletNo);
-                    //wallet.Balance = wallet.Balance + tran.Amount;
-                    //wallet.TimeUpdate = DateTime.Now;
+            /* while(1 == 1)
+             {
+                 if(queue.Count > 0)
+                 {
+                     Transaction tran = new Transaction();
+                     Transaction  transaction = queue.Peek();
+                     tran.WalletId = transaction.WalletId;
+                     tran.Amount = transaction.Amount;
+                     tran.Destination = transaction.Destination;
+                     tran.Type = transaction.Type;
+                     tran.TimeCreate = DateTime.Now;
+                     tran.WalletNo = transaction.WalletNo;
+                     //var wallet = _context.Wallets.FirstOrDefault(x => x.WalletNo == transaction.WalletNo);
+                     //wallet.Balance = wallet.Balance + tran.Amount;
+                     //wallet.TimeUpdate = DateTime.Now;
 
-                    Wallet wallet = _context.Wallets.FirstOrDefault(x => x.WalletNo == transaction.WalletNo);
-                    System.Diagnostics.Debug.WriteLine(wallet.Balance);
-                    wallet.Balance = wallet.Balance + transaction.Amount;
-                    System.Diagnostics.Debug.WriteLine(wallet.Balance);
-                    wallet.TimeUpdate = DateTime.Now;
+                     Wallet wallet = _context.Wallets.FirstOrDefault(x => x.WalletNo == transaction.WalletNo);
+                     System.Diagnostics.Debug.WriteLine(wallet.Balance);
+                     wallet.Balance = wallet.Balance + transaction.Amount;
+                     System.Diagnostics.Debug.WriteLine(wallet.Balance);
+                     wallet.TimeUpdate = DateTime.Now;
 
-                    _context.Transactions.Add(tran);
-                    _context.SaveChanges();
-                    System.Diagnostics.Debug.WriteLine("Dequeue()");
-                    queue.Dequeue();
-                }
-                Thread.Sleep(100);
-            }  */
-          
+                     _context.Transactions.Add(tran);
+                     _context.SaveChanges();
+                     System.Diagnostics.Debug.WriteLine("Dequeue()");
+                     queue.Dequeue();
+                 }
+                 Thread.Sleep(100);
+             }  */
+
             var tran = new Transaction();
             tran.WalletId = transaction.WalletId;
             tran.Amount = transaction.Amount;
@@ -183,7 +207,7 @@ namespace WalletFirst.Controllers
             //wallet.TimeUpdate = DateTime.Now;
             _context.SaveChanges();
 
-            // Thread thread = new Thread(() => ThreadProc(transaction));
+
             Queue<Transaction> queue = new Queue<Transaction>();
 
             queue.Enqueue(tran);
@@ -229,10 +253,10 @@ namespace WalletFirst.Controllers
                 System.Diagnostics.Debug.WriteLine("Dequeue()");
                 queue.Dequeue();
             }
-            return transactionResult; 
+            return transactionResult;
         }
 
-        
+        //notuse
         [HttpPost("PostTransactionDet")]
         public async Task<ActionResult<Transaction>> PostTransactionDet (Transaction transaction)
         {
@@ -256,7 +280,7 @@ namespace WalletFirst.Controllers
             queue.Enqueue(tran);
             System.Diagnostics.Debug.WriteLine(queue.Peek().TransId);
             System.Diagnostics.Debug.WriteLine(queue.Count);
-            
+
             if (queue.Count > 0)
                 Thread.Sleep(1000);
 
@@ -286,9 +310,9 @@ namespace WalletFirst.Controllers
 
                 System.Diagnostics.Debug.WriteLine("start");
                 Wallet wallet = _context.Wallets.FirstOrDefault(x => x.WalletNo == transaction.WalletNo);
-                System.Diagnostics.Debug.WriteLine("1st " +wallet.Balance);
+                System.Diagnostics.Debug.WriteLine("1st " + wallet.Balance);
                 wallet.Balance = wallet.Balance + transaction.Amount;
-                System.Diagnostics.Debug.WriteLine("2nd " +wallet.Balance);
+                System.Diagnostics.Debug.WriteLine("2nd " + wallet.Balance);
                 wallet.TimeUpdate = DateTime.Now;
 
                 _context.SaveChanges();
@@ -300,19 +324,24 @@ namespace WalletFirst.Controllers
 
 
         [HttpGet("thread")]
-        public async Task<ActionResult<Transaction>> ThreadProc3 (Transaction transaction )
+        public async Task<ActionResult<WalletWithTransactions>> ThreadProc3 (Transaction transaction)
         {
-            int result = ThreadProc(transaction);
-            var resultTransaction = _context.Transactions.Where(x => x.TransId == result).FirstOrDefault();
+            // Thread thread = new Thread(() => ThreadProc(transaction));
+            int result = AddTransaction(transaction);
+
+            var resultTransaction = _context.Transactions
+                .Where(x => x.TransId == result)
+                .FirstOrDefault();
+
+            WalletWithTransactions walletUpdate = null;
             BackgroundPrinter.AddTransaction(resultTransaction);
 
-            return resultTransaction;
+            return walletUpdate;
         }
 
-        public int ThreadProc (Transaction transaction)
+        public int AddTransaction (Transaction transaction)
         {
-            Thread thread = Thread.CurrentThread;
-            //Transaction transaction = queue.Peek();
+            //Thread thread = Thread.CurrentThread;
             Transaction tran = new Transaction();
             tran.WalletId = transaction.WalletId;
             tran.Amount = transaction.Amount;
@@ -322,20 +351,19 @@ namespace WalletFirst.Controllers
             tran.WalletNo = transaction.WalletNo;
             _context.Transactions.Add(tran);
             _context.SaveChanges();
+
             return tran.TransId;
         }
 
 
-
+        // not use
         public void ThreadProc2 (Transaction transaction)
         {
-
             Wallet wallet = _context.Wallets.FirstOrDefault(x => x.WalletNo == transaction.WalletNo);
             System.Diagnostics.Debug.WriteLine(wallet.Balance);
             wallet.Balance = wallet.Balance + transaction.Amount;
             System.Diagnostics.Debug.WriteLine(wallet.Balance);
             wallet.TimeUpdate = DateTime.Now;
-
             _context.SaveChanges();
             System.Diagnostics.Debug.WriteLine("Dequeue()");
             Queue<Transaction> queue = new Queue<Transaction>();
@@ -343,46 +371,145 @@ namespace WalletFirst.Controllers
 
         }
 
-  
-[HttpPost("PostTransactionDee")]
-        public async Task<ActionResult<Transaction>> PostTransactionDee (Transaction transaction)
+        private static int intNum = 0;
+
+        //Top up with Lock
+        [HttpPost("TopUp1")]
+        public ActionResult<Transaction> TopUp1 (Transaction transaction)
         {
-            
-                var wallet = new Wallet();
-                var tran = new Transaction();
-         
-                lock (balanceLock)
-                {
 
-                    tran.WalletId = transaction.WalletId;
-                    tran.Amount = transaction.Amount;
-                    tran.Destination = transaction.Destination;
-                    tran.Type = transaction.Type;
-                    tran.TimeCreate = DateTime.Now;
-                    tran.WalletNo = transaction.WalletNo;
-                    _context.Transactions.Add(tran);
+            var wallet = new Wallet();
+            var tran = new Transaction();
+            var result = new Transaction();
 
-                    wallet = _context.Wallets.FirstOrDefault(x => x.WalletNo == transaction.WalletNo);
+            tran.WalletId = transaction.WalletId;
+            tran.Amount = transaction.Amount;
+            tran.Destination = transaction.Destination;
+            tran.Type = transaction.Type;
+            tran.TimeCreate = DateTime.Now;
+            tran.WalletNo = transaction.WalletNo;
+            tran.BalanceO = 0;
+            tran.BalanceN = 0;
 
-                    wallet.Balance = wallet.Balance + tran.Amount;
-                    wallet.TimeUpdate = DateTime.Now;
-                    System.Diagnostics.Debug.WriteLine(wallet.Balance);
-                    _context.SaveChanges();
-                    Thread.Sleep(100);
-                }   
-                         
+            lock (balanceLock)
+            {
+
+                intNum++;
+                _context.Transactions.Add(tran);
+                _context.SaveChanges();
+              
+                wallet = _context.Wallets.FirstOrDefault(x => x.WalletNo == transaction.WalletNo);
+
+                wallet.Balance = wallet.Balance + tran.Amount;
+                wallet.TimeUpdate = DateTime.Now;
+                tran.BalanceN = wallet.Balance;
+                tran.BalanceO = wallet.Balance - tran.Amount;
+                _context.SaveChanges();
+
+                result = _context.Transactions.FirstOrDefault(x => x.TransId == tran.TransId);
+                result.Wallet = wallet;
+                System.Diagnostics.Debug.WriteLine(" Thread Id = " + Thread.CurrentThread.ManagedThreadId + " TransId = " + result.TransId + " WalletId = " + result.WalletId + " Balance = " + result.Wallet.Balance + "  Count= " + intNum);
+                
+                return result;
+
+            }
+
+        }
+
+        //Top up with Distributed Lock
+        [HttpPost("TopUp2")]
+        public ActionResult<Transaction> TopUp2 (Transaction transaction)
+        {
+
+            var wallet = new Wallet();
+            var tran = new Transaction();
+            var connectionString = "Server=DESKTOP-AQCHHJ8;Initial Catalog=WalletDB;Trusted_Connection=True;";
+            var myDistributedLock = new SqlDistributedLock(transaction.WalletNo,/* _context.Database.GetConnectionString()*/ connectionString);
+
+            tran.WalletId = transaction.WalletId;
+            tran.Amount = transaction.Amount;
+            tran.Destination = transaction.Destination;
+            tran.Type = transaction.Type;
+            tran.TimeCreate = DateTime.Now;
+            tran.WalletNo = transaction.WalletNo;
+            tran.BalanceN = 0;
+            tran.BalanceO = 0;
+
+            using (myDistributedLock.Acquire())
+            {
+
+                intNum++;
+                _context.Transactions.Add(tran);
+                _context.SaveChanges();
+
+                wallet = _context.Wallets.FirstOrDefault(x => x.WalletNo == transaction.WalletNo);
+
+                wallet.Balance = wallet.Balance + tran.Amount;
+                wallet.TimeUpdate = DateTime.Now;
+                tran.BalanceN = wallet.Balance;
+                tran.BalanceO = wallet.Balance - tran.Amount;
+                _context.SaveChanges();
+
+                tran.Wallet = wallet;
+                System.Diagnostics.Debug.WriteLine(" Thread Id = " + Thread.CurrentThread.ManagedThreadId + " TransId = " + tran.TransId + " WalletId = " + tran.WalletId + " Balance = " + tran.Wallet.Balance + "  Count= " + intNum);
+
+            }
             return tran;
+
+        }
+
+        [HttpPost("TopUp3")]
+        public  ActionResult<Transaction> TopUp(Transaction transaction)
+        {
+            lock (balanceLock)
+            {
+            var wallet = new Wallet();
+            var tran = new Transaction();
+
+            tran.WalletId = transaction.WalletId;
+            tran.Amount = transaction.Amount;
+            tran.Destination = transaction.Destination;
+            tran.Type = transaction.Type;
+            tran.TimeCreate = DateTime.Now;
+            tran.WalletNo = transaction.WalletNo;
+            tran.BalanceO = 0;
+            tran.BalanceN = 0;
+
+            _context.Transactions.Add(tran);
+            _context.SaveChanges();
+            
+            var commandText = "BEGIN TRANSACTION; " +
+                   " UPDATE[dbo].[Wallet] SET balance = balance + @Amount2 WHERE wallet_id = @myWalletId   " +
+                   " UPDATE[dbo].[Transaction] SET balance_o = T2.balance - @Amount , balance_n = T2.balance " +
+                   " FROM[dbo].[Transaction] T1 , [dbo].[Wallet] T2            " +
+                   " WHERE trans_id = @myTransId     " +
+                   " COMMIT;";
+
+            var Amount = new SqlParameter("@Amount", tran.Amount);
+            var Amount2 = new SqlParameter("@Amount2", tran.Amount);
+            var myWalletId = new SqlParameter("@myWalletId", tran.WalletId);
+            var myTransId = new SqlParameter("@myTransId", tran.TransId);
+            _context.Database.ExecuteSqlRaw(commandText, new[] { Amount2, myWalletId, Amount, myTransId });
+            _context.SaveChanges();
+          
+
+            var thing = _context.Transactions.Find(tran.TransId);
+            _context.Entry(thing).State = EntityState.Detached;
+            var result =  _context.Transactions.FirstOrDefault(x => x.TransId == tran.TransId);
+            
+            return result;
+            }
         }
 
 
-        public  TransactionScope CreateTransactionScope ()
-            {
-                TransactionOptions transactionOptions = new TransactionOptions();
-                transactionOptions.IsolationLevel = IsolationLevel.ReadCommitted;
-                transactionOptions.Timeout = TransactionManager.MaximumTimeout;
-                return new TransactionScope(TransactionScopeOption.Required, transactionOptions);
-            }
-        
+        public TransactionScope CreateTransactionScope ()
+        {
+            TransactionOptions transactionOptions = new TransactionOptions();
+            transactionOptions.IsolationLevel = IsolationLevel.ReadCommitted;
+            transactionOptions.Timeout = TransactionManager.MaximumTimeout;
+            return new TransactionScope(TransactionScopeOption.Required, transactionOptions);
+        }
+
 
         private int saveTransaction (Transaction transaction)
         {
@@ -403,26 +530,26 @@ namespace WalletFirst.Controllers
             return tran.TransId;
         }
 
-     
 
-           
 
-   
 
-            /*int tran = 0 ;
-            Thread thread = new Thread(() =>
-           {
-               tran = saveTransaction(transaction);
-           });
-            thread.Start();
 
-            thread.Join();
-            var transactionResult = _context.Transactions
-                          //    .Include(transaction => transaction.Wallet)
-                          //    .ThenInclude(transaction => transaction.Customer)
-                .FirstOrDefault(transaction => transaction.TransId == tran);
-            */
-        
+
+
+        /*int tran = 0 ;
+        Thread thread = new Thread(() =>
+       {
+           tran = saveTransaction(transaction);
+       });
+        thread.Start();
+
+        thread.Join();
+        var transactionResult = _context.Transactions
+                      //    .Include(transaction => transaction.Wallet)
+                      //    .ThenInclude(transaction => transaction.Customer)
+            .FirstOrDefault(transaction => transaction.TransId == tran);
+        */
+
 
         // Post: api/Transaction/
         [HttpPost("PostTransactionDetails")]
@@ -631,58 +758,87 @@ namespace WalletFirst.Controllers
             {
                 return NotFound();
             }
-            
+
 
             _context.TransactionTypes.Remove(transaction);
             await _context.SaveChangesAsync();
-            
+
             return NoContent();
         }
-
-        public static void UpdateBalance (Transaction transaction)
-        {
-            // var transaction = await _context.TransactionTypes.FindAsync(id);
-           // UpdateBalance2(transaction);
-        }
-
-        public  void UpdateBalance2 (Transaction transaction)
-        {
-            // var transaction = await _context.TransactionTypes.FindAsync(id);
-
-        }
     }
-   
-    public  class BackgroundPrinter : IHostedService, IDisposable
+
+
+    public class BackgroundPrinter : IHostedService, IDisposable
     {
-        private readonly WalletDBContext _context;
+        //private readonly WalletDBContext _context;
+        private readonly IServiceScopeFactory scopeFactory;
         private readonly ILogger<BackgroundPrinter> logger;
         private Timer timer;
-        static Queue<Transaction> queuetest = new Queue<Transaction>();
-        private readonly IServiceScopeFactory scopeFactory;
-    
-        public BackgroundPrinter (ILogger<BackgroundPrinter> logger , IServiceScopeFactory scopeFactory)
+        static Queue<Transaction> queueTrans = new Queue<Transaction>();
+        static Queue<WalletWithTransactions> queueBalance = new Queue<WalletWithTransactions>();
+        private readonly object balanceLock = new object();
+
+
+        public BackgroundPrinter (ILogger<BackgroundPrinter> logger, IServiceScopeFactory scopeFactory)
         {
             this.logger = logger;
             this.scopeFactory = scopeFactory;
-            _context = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<WalletDBContext>();
+            //  _context = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<WalletDBContext>();
         }
 
-        public static void AddTransaction (Transaction transaction)
+        public static void  AddTransaction (Transaction resultTransaction)
         {
-            Thread.Sleep(100);
+
+            //Thread.Sleep(100);
             System.Diagnostics.Debug.WriteLine(Thread.CurrentThread.ManagedThreadId);
-            queuetest.Enqueue(transaction);
+            queueTrans.Enqueue(resultTransaction);
+
+            while (queueBalance.Count == 0)
+            {
+                Thread.Sleep(100);
+            }
+           
+            while (queueBalance.Peek().TransId != resultTransaction.TransId)
+            {
+                Thread.Sleep(100);
+            }
+            
+           // System.Diagnostics.Debug.WriteLine($" queueBalance Count Down = {queueBalance.Count} ");
+           // System.Diagnostics.Debug.WriteLine($" queueBalance ALL COUNT = {queueBalance2.Count} ");
+         //   return 
+            queueBalance.Dequeue(); 
+                    
         }
 
-        public void updateBalance (Transaction transaction)
+        public void updateBalance (Transaction resultTransaction)
         {
-            Wallet wallet = _context.Wallets
-                .Where(x => x.WalletId == transaction.WalletId)
-                .FirstOrDefault();
-            wallet.Balance = wallet.Balance + transaction.Amount;
-            wallet.TimeUpdate = DateTime.Now;
-            _context.SaveChanges();
+            using (var scope = scopeFactory.CreateScope())
+            {
+                var dBContext = scope.ServiceProvider.GetRequiredService<WalletDBContext>();
+
+                Wallet wallet = dBContext.Wallets
+                .FirstOrDefault(x => x.WalletId == resultTransaction.WalletId);
+
+                wallet.Balance = wallet.Balance + resultTransaction.Amount;
+                wallet.TimeUpdate = DateTime.Now;
+                dBContext.SaveChanges();
+
+                TempTrans(resultTransaction.TransId , wallet.Balance);
+            }
         }
+
+        public void TempTrans (int transId , decimal? balance)
+        {
+            WalletWithTransactions walletWithTransactions = null;
+            walletWithTransactions = new WalletWithTransactions();
+            walletWithTransactions.TransId = transId;
+            walletWithTransactions.Balance = balance;
+
+               
+            queueBalance.Enqueue(walletWithTransactions);
+           // queueBalance2.Enqueue(walletWithTransactions);
+        }
+    
 
         public void Dispose ()
         {
@@ -692,20 +848,22 @@ namespace WalletFirst.Controllers
         public Task StartAsync (CancellationToken cancellationToken)
         {
             timer = new Timer(o =>
-            {
-                string te = queuetest.Count.ToString();
-                logger.LogInformation($"test {te} ");
-                if (queuetest.Count > 0) {
-                    updateBalance(queuetest.Dequeue());
-                    // Interlocked.Increment(ref number);
-                    // logger.LogInformation($"Printing the worker number {number}");
-                }
-
-            },
+           {
+               lock (balanceLock)
+               {
+                   string qt = queueTrans.Count.ToString();
+                  // logger.LogInformation($"Count down {qt} ");
+                   if (queueTrans.Count > 0) {
+                       updateBalance(queueTrans.Dequeue());
+                       // Interlocked.Increment(ref number);
+                       // logger.LogInformation($"Printing the worker number {number}");
+                   }
+               }
+           },
             null,
             TimeSpan.Zero,
             TimeSpan.FromMilliseconds(100));
-            
+
             return Task.CompletedTask;
         }
 
@@ -713,5 +871,74 @@ namespace WalletFirst.Controllers
         {
             return Task.CompletedTask;
         }
+
+    }
+
+    public class Fibonacci
+    {
+        private ManualResetEvent _doneEvent;
+
+        public Fibonacci (int n, ManualResetEvent doneEvent)
+        {
+            N = n;
+            _doneEvent = doneEvent;
+        }
+
+        public int N { get; }
+
+        public int FibOfN { get; private set; }
+
+        public void ThreadPoolCallback (Object threadContext)
+        {
+            int threadIndex = (int) threadContext;
+            System.Diagnostics.Debug.WriteLine($"Thread {threadIndex} started...");
+            FibOfN = Calculate(N);
+            System.Diagnostics.Debug.WriteLine($"Thread {threadIndex} result calculated...");
+            _doneEvent.Set();
+        }
+
+        public int Calculate (int n)
+        {
+            if (n <= 1)
+            {
+                return n;
+            }
+            return Calculate(n - 1) + Calculate(n - 2);
+        }
+    }
+
+    public class ThreadPoolExample
+    {
+        public static void testTing()
+        {
+            const int FibonacciCalculations = 2;
+
+            var doneEvents = new ManualResetEvent[FibonacciCalculations];
+            var fibArray = new Fibonacci[FibonacciCalculations];
+            var rand = new Random();
+
+            System.Diagnostics.Debug.WriteLine($"Launching {FibonacciCalculations} tasks...");
+            for (int i = 0; i < FibonacciCalculations; i++)
+            {
+                doneEvents[i] = new ManualResetEvent(false);
+                var f = new Fibonacci(rand.Next(20, 40), doneEvents[i]);
+                fibArray[i] = f;
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback, i);
+            }
+
+            WaitHandle.WaitAll(doneEvents);
+            System.Diagnostics.Debug.WriteLine("All calculations are complete.");
+
+            for (int i = 0; i < FibonacciCalculations; i++)
+            {
+                Fibonacci f = fibArray[i];
+                System.Diagnostics.Debug.WriteLine($"Fibonacci({f.N}) = {f.FibOfN}");
+            }
+        }
     }
 }
+
+
+
+   
+

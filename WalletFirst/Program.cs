@@ -25,7 +25,7 @@ namespace WalletFirst
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                }).ConfigureServices(services =>
-                    services.AddHostedService<BackgroundPrinter>());
+                })/*.ConfigureServices(services =>
+                    services.AddHostedService<BackgroundPrinter>())*/;
     }
 }

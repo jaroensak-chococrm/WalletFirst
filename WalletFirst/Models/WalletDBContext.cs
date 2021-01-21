@@ -194,6 +194,14 @@ namespace WalletFirst.Models
                     .HasColumnType("decimal(18, 0)")
                     .HasColumnName("amount");
 
+                entity.Property(e => e.BalanceN)
+                    .HasColumnType("decimal(18, 0)")
+                    .HasColumnName("balance_n");
+
+                entity.Property(e => e.BalanceO)
+                    .HasColumnType("decimal(18, 0)")
+                    .HasColumnName("balance_o");
+
                 entity.Property(e => e.Destination)
                     .HasMaxLength(100)
                     .IsUnicode(false)
