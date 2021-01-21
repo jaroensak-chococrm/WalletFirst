@@ -54,7 +54,7 @@ namespace WalletFirst.Controllers
             {
                 return NotFound();
             }
-
+            Console.Write("das");
             return trans;
         }
 
@@ -64,7 +64,7 @@ namespace WalletFirst.Controllers
         {
             var trans = _context.Transactions
                 .Include(trans => trans.Wallet)
-                .ThenInclude(trans => trans.Customer)
+                .ThenInclude(trans => trans.WalletId)
                 .Where(trans => trans.TransId == id)
                 .FirstOrDefault();
 
