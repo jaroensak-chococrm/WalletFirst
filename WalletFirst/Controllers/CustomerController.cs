@@ -61,7 +61,7 @@ namespace WalletFirst.Controllers
             var customer = await _context.Customers
                 .Where(user => user.Email == email)
                 .FirstOrDefaultAsync();
-
+                               //test 2 connection
             customer.Password = null;
 
             if (customer == null)
