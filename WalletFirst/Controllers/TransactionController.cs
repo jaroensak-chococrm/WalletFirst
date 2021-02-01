@@ -377,7 +377,7 @@ namespace WalletFirst.Controllers
         [HttpPost("TopUp1")]
         public ActionResult<Transaction> TopUp1 (Transaction transaction)
         {
-
+               ///connection lost
             var wallet = new Wallet();
             var tran = new Transaction();
             var result = new Transaction();
