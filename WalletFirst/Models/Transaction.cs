@@ -12,7 +12,9 @@ namespace WalletFirst.Models
         public string WalletNo { get; set; }
         public int Type { get; set; }
         public string Destination { get; set; }
-        public decimal Amount { get; set; }
+        public decimal? Amount { get; set; }
+        public decimal? BalanceO { get; set; }
+        public decimal? BalanceN { get; set; }
         public DateTime TimeCreate { get; set; }
 
         public virtual TransactionType TypeNavigation { get; set; }

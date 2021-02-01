@@ -44,6 +44,7 @@ namespace WalletFirst
 
             services.AddDbContext<WalletDBContext>(opt =>
               opt.UseSqlServer(Configuration.GetConnectionString("BloggingDatabase")));
+           // services.AddDbContext<MyContext>(ServiceLifetime.Transient);
 
             var jwtSection = Configuration.GetSection("JWTSettings");
                  services.Configure<JWTSettings>(jwtSection);
